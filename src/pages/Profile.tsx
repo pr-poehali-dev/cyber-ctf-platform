@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Icon from '@/components/ui/icon';
 import {
-  getCurrentUser, saveCurrentUser, resetAllData, getLeaderboard,
+  getCurrentUser, saveCurrentUser, resetAllData, resetTest, getLeaderboard,
   getTasksByLevel, getCoursesByLevel, getCourseProgress,
   ALL_TASKS, type User, type Level
 } from '@/lib/store';
@@ -252,6 +252,22 @@ export default function Profile({ level, onLevelChange }: ProfileProps) {
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Пройти тест снова */}
+          <div className="cyber-card p-5">
+            <h3 className="text-white font-display font-bold mb-1 flex items-center gap-2">
+              <Icon name="Brain" size={14} className="neon-text" /> Входной тест
+            </h3>
+            <p className="text-xs mb-4" style={{ color: 'var(--text-dim)' }}>
+              Уровень определён тестом. Хочешь пройти его снова и пересмотреть свой уровень?
+            </p>
+            <button
+              onClick={() => { resetTest(); window.location.reload(); }}
+              className="cyber-btn py-2 px-5 text-xs flex items-center gap-2"
+            >
+              <Icon name="RotateCcw" size={12} /> Пройти тест заново
+            </button>
           </div>
 
           {/* Опасная зона */}

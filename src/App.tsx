@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import Icon from '@/components/ui/icon';
-import { initStore, getCurrentUser, saveCurrentUser, type Level } from '@/lib/store';
+import { initStore, getCurrentUser, saveCurrentUser, isTestCompleted, completeTest, type Level } from '@/lib/store';
 import Dashboard from '@/pages/Dashboard';
 import Tasks from '@/pages/Tasks';
 import Courses from '@/pages/Courses';
 import Leaderboard from '@/pages/Leaderboard';
 import Events from '@/pages/Events';
 import Profile from '@/pages/Profile';
+import LevelTest from '@/pages/LevelTest';
 
 type Page = 'dashboard' | 'tasks' | 'courses' | 'leaderboard' | 'events' | 'profile';
 
@@ -52,6 +53,7 @@ export default function App() {
   const [page, setPage] = useState<Page>('dashboard');
   const [level, setLevel] = useState<Level>('beginner');
   const [mobileMenu, setMobileMenu] = useState(false);
+  const [showTest, setShowTest] = useState(false);
   const [user, setUser] = useState(() => { initStore(); return getCurrentUser(); });
 
   useEffect(() => {
@@ -59,7 +61,19 @@ export default function App() {
     const u = getCurrentUser();
     setLevel(u.level);
     setUser(u);
+    // Показать тест если ещё не проходил
+    if (!isTestCompleted()) {
+      setShowTest(true);
+    }
   }, []);
+
+  const handleTestComplete = (detectedLevel: Level, _score: number) => {
+    completeTest(detectedLevel);
+    setLevel(detectedLevel);
+    const u = getCurrentUser();
+    setUser({ ...u, level: detectedLevel });
+    setShowTest(false);
+  };
 
   const handleLevelChange = (newLevel: Level) => {
     setLevel(newLevel);
@@ -89,6 +103,9 @@ export default function App() {
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
+      {/* Входной тест — показывается поверх всего при первом входе */}
+      {showTest && <LevelTest onComplete={handleTestComplete} />}
+
       <MatrixRain />
 
       {/* ───────── ШАПКА ───────── */}

@@ -713,6 +713,29 @@ export const DEMO_LEADERBOARD: Omit<User, 'completedModules'>[] = [
 
 const CURRENT_USER_KEY = 'cyberlearn_user';
 const LEADERBOARD_KEY = 'cyberlearn_leaderboard';
+const TEST_COMPLETED_KEY = 'cyberlearn_test_done';
+
+/** Проверить, прошёл ли пользователь входной тест */
+export function isTestCompleted(): boolean {
+  return localStorage.getItem(TEST_COMPLETED_KEY) === 'true';
+}
+
+/** Отметить тест как пройденный и выставить уровень */
+export function completeTest(level: Level): void {
+  localStorage.setItem(TEST_COMPLETED_KEY, 'true');
+  // Если пользователь уже есть — обновляем уровень, иначе создаём нового
+  const raw = localStorage.getItem(CURRENT_USER_KEY);
+  if (raw) {
+    const user = JSON.parse(raw) as User;
+    user.level = level;
+    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+  }
+}
+
+/** Сбросить флаг теста (для кнопки "Пройти тест снова" в профиле) */
+export function resetTest(): void {
+  localStorage.removeItem(TEST_COMPLETED_KEY);
+}
 
 /** Инициализирует все данные при первом запуске */
 export function initStore(): void {
@@ -789,10 +812,11 @@ export function getLeaderboard(): Omit<User, 'completedModules'>[] {
   return JSON.parse(raw) as Omit<User, 'completedModules'>[];
 }
 
-/** Сбросить все данные */
+/** Сбросить все данные (включая флаг теста) */
 export function resetAllData(): void {
   localStorage.removeItem(CURRENT_USER_KEY);
   localStorage.removeItem(LEADERBOARD_KEY);
+  localStorage.removeItem(TEST_COMPLETED_KEY);
   initStore();
 }
 
